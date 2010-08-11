@@ -58,7 +58,7 @@ var VideoJS = Class.extend({
     // Check if browser can play HTML5 video
     if (VideoJS.browserSupportsVideo()) {
       // Force flash fallback when there's no supported source
-      if (this.canPlaySource() == false) {
+      if (this.canPlaySource() == false && !VideoJS.isAndroid()) {
         this.replaceWithFlash();
         return;
       }
@@ -379,6 +379,8 @@ var VideoJS = Class.extend({
         var canPlay = this.video.canPlayType(children[i].type);
         if(canPlay == "probably" || canPlay == "maybe") {
           return true;
+        } else if (VideoJS.isAndroid && children[i].src.match(/mp4/)) {
+          children[i].removeAttribute('type');
         }
       }
     }
@@ -454,6 +456,13 @@ var VideoJS = Class.extend({
 
   // React to clicks on the play/pause button
   onPlayControlClick: function(event){
+    // Don't show controls if Android
+    if (VideoJS.isAndroid()) {
+      this.video.play();
+      // fix Android bug with the removed type attribute
+      setTimeout(function(){ this.video.play(); }.context(this), 200);
+      return;
+    }
     if (this.video.paused) {
       this.video.play();
     } else {
@@ -932,6 +941,7 @@ VideoJS.getFlashVersion = function(){
 
 VideoJS.isIE = function(){ return !+"\v1"; }
 VideoJS.isIpad = function(){ return navigator.userAgent.match(/iPad/i) != null; }
+VideoJS.isAndroid = function(){ return navigator.userAgent.match(/Android/i) != null; };
 
 // Allows for binding context to functions
 // when using in event listeners and timeouts
