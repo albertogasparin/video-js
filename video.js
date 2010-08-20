@@ -380,7 +380,8 @@ var VideoJS = Class.extend({
         if(canPlay == "probably" || canPlay == "maybe") {
           return true;
         } else if (VideoJS.isAndroid && children[i].src.match(/mp4/)) {
-          children[i].removeAttribute('type');
+          // if Android, add source directly to video tag otherwise it will not play
+          this.video.src = children[i].src;
         }
       }
     }
@@ -456,13 +457,6 @@ var VideoJS = Class.extend({
 
   // React to clicks on the play/pause button
   onPlayControlClick: function(event){
-    // Don't show controls if Android
-    if (VideoJS.isAndroid()) {
-      this.video.play();
-      // fix Android bug with the removed type attribute
-      setTimeout(function(){ this.video.play(); }.context(this), 200);
-      return;
-    }
     if (this.video.paused) {
       this.video.play();
     } else {
