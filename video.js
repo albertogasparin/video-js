@@ -379,7 +379,7 @@ var VideoJS = Class.extend({
         var canPlay = this.video.canPlayType(children[i].type);
         if(canPlay == "probably" || canPlay == "maybe") {
           return true;
-        } else if (VideoJS.isAndroid && children[i].src.match(/mp4/)) {
+        } else if (VideoJS.isAndroid() && children[i].src.match(/mp4/)) {
           // if Android, add source directly to video tag otherwise it will not play
           this.video.src = children[i].src;
         }
@@ -457,7 +457,8 @@ var VideoJS = Class.extend({
 
   // React to clicks on the play/pause button
   onPlayControlClick: function(event){
-    if (this.video.paused) {
+    // Andorid does not update "paused" property when exit form playback
+    if (this.video.paused || VideoJS.isAndroid()) {
       this.video.play();
     } else {
       this.video.pause();
